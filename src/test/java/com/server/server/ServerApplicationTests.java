@@ -10,7 +10,6 @@ import com.server.server.threshold.ThresholdRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
-
 import java.lang.reflect.InvocationTargetException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -23,7 +22,6 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ServerApplicationTests {
-    public static final byte SERVER_VERSION = 1;
 
     @Mock
     private SystemMetricRepository metricRepository;
@@ -73,15 +71,17 @@ class ServerApplicationTests {
         method.invoke(serverApp, "127.0.0.1", MetricType.CPU, 80f, LocalDateTime.now());
 
         verify(alertRepository, times(1)).save(any(Alert.class));
-    }@Test
+    }
+
+    @Test
     void testUdpMessageReceivedAndSaved() throws Exception {
         byte[] data = new byte[9];
-        data[0] = ServerApplication.SERVER_VERSION; // ✅ must set version
+        data[0] = ServerApplication.SERVER_VERSION;
 
         ByteBuffer buffer = ByteBuffer.wrap(data, 1, 8);
         buffer.order(ByteOrder.BIG_ENDIAN);
-        buffer.putInt(3);      // CPU
-        buffer.putFloat(65.5f);// metric value
+        buffer.putInt(3);
+        buffer.putFloat(65.5f);
 
         DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("127.0.0.1"), 5000);
 
@@ -102,12 +102,12 @@ class ServerApplicationTests {
     void testMultipleUdpMessagesSaved() throws Exception {
         for (int i = 0; i < 3; i++) {
             byte[] data = new byte[9];
-            data[0] = ServerApplication.SERVER_VERSION; // ✅ version byte
+            data[0] = ServerApplication.SERVER_VERSION;
 
             ByteBuffer buffer = ByteBuffer.wrap(data, 1, 8);
             buffer.order(ByteOrder.BIG_ENDIAN);
-            buffer.putInt(3);             // CPU
-            buffer.putFloat(50 + i * 5f); // metric value
+            buffer.putInt(3);
+            buffer.putFloat(50 + i * 5f);
 
             DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("127.0.0.1"), 5000);
 
@@ -115,20 +115,20 @@ class ServerApplicationTests {
             method.setAccessible(true);
             method.invoke(serverApp, packet);
         }
-
         verify(metricRepository, times(3)).save(any(SystemMetric.class));
     }
+
     @Test
     void testUdpMessageWithExtraBytes_Ignored() throws Exception {
-        byte[] data = new byte[12]; // 3 extra bytes
+        byte[] data = new byte[12];
         data[0] = ServerApplication.SERVER_VERSION; // ✅ version byte
 
         ByteBuffer buffer = ByteBuffer.wrap(data, 1, 8);
         buffer.order(ByteOrder.BIG_ENDIAN);
-        buffer.putInt(3);  // CPU
-        buffer.putFloat(75f);// value
+        buffer.putInt(3);
+        buffer.putFloat(75f);
 
-        // extra bytes remain at the end (ignored)
+
         data[9] = (byte) 0xFF;
         data[10] = (byte) 0xAA;
         data[11] = (byte) 0x01;
@@ -153,7 +153,7 @@ class ServerApplicationTests {
         byte[] data = new byte[9];
         ByteBuffer buffer = ByteBuffer.wrap(data, 1, data.length - 1);
         buffer.order(ByteOrder.BIG_ENDIAN);
-        buffer.putInt(99); // invalid typeCode
+        buffer.putInt(99);
         buffer.putFloat(50f);
 
         DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("127.0.0.1"), 5000);
@@ -162,7 +162,7 @@ class ServerApplicationTests {
         method.setAccessible(true);
         method.invoke(serverApp, packet);
 
-        verify(metricRepository, never()).save(any()); // metric should not be saved
+        verify(metricRepository, never()).save(any());
     }
 
     @Test
