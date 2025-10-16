@@ -11,25 +11,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
+import org.springframework.core.env.Environment;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @SpringBootApplication
 public class ServerApplication implements CommandLineRunner {
 
     private static final int BUFFER_SIZE = 1024;
-    private static final byte SERVER_VERSION = 1;
+    static final byte SERVER_VERSION = 1;
 
     private final SystemMetricRepository metricRepository;
     private final ThresholdRepository thresholdRepository;
     private final AlertRepository alertRepository;
-
+    @Autowired
+    private Environment environment;
     @Autowired
     public ServerApplication(SystemMetricRepository metricRepository,
                              ThresholdRepository thresholdRepository,
@@ -45,6 +47,12 @@ public class ServerApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+
+        if (Arrays.asList(environment.getActiveProfiles()).contains("test")) {
+            System.out.println("Skipping UDP server loop in test profile.");
+            return;
+        }
+
         // Read bind IP and UDP port from environment variables
         String bindIp = System.getenv().getOrDefault("SERVER_BIND_IP", "0.0.0.0");
         int udpPort = Integer.parseInt(System.getenv().getOrDefault("SERVER_UDP_PORT", "4000"));
@@ -85,7 +93,7 @@ public class ServerApplication implements CommandLineRunner {
         }
     }
 
-    private void processMessage(DatagramPacket packet) {
+    void processMessage(DatagramPacket packet) {
         byte[] data = packet.getData();
         int length = packet.getLength();
 
@@ -128,6 +136,7 @@ public class ServerApplication implements CommandLineRunner {
         System.out.println("Saved metric to DB: " + metric);
 
         checkThreshold(clientIp, type, value, now);
+
     }
 
     private MetricType mapType(int type) {
@@ -172,5 +181,7 @@ public class ServerApplication implements CommandLineRunner {
                 }
             }
         }
-    }
+    }// In ServerApplication.java
+
+
 }
