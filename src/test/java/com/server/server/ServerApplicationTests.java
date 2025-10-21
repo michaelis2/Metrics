@@ -121,7 +121,7 @@ class ServerApplicationTests {
     @Test
     void testUdpMessageWithExtraBytes_Ignored() throws Exception {
         byte[] data = new byte[12];
-        data[0] = ServerApplication.SERVER_VERSION; // ✅ version byte
+        data[0] = ServerApplication.SERVER_VERSION;
 
         ByteBuffer buffer = ByteBuffer.wrap(data, 1, 8);
         buffer.order(ByteOrder.BIG_ENDIAN);

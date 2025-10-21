@@ -26,6 +26,8 @@ public class User {
     @Column(nullable=false)
     private LocalDateTime createdDate;
     private LocalDateTime lastLogin;
+    @Column(columnDefinition = "TEXT")
+    private String dashboardLayout;
 
     public User() {
     }
@@ -88,6 +90,14 @@ public class User {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getDashboardLayout() {
+        return dashboardLayout;
+    }
+
+    public void setDashboardLayout(String dashboardLayout) {
+        this.dashboardLayout = dashboardLayout;
     }
 }
 

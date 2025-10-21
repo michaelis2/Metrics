@@ -100,4 +100,22 @@ public class AuthController {
 
         return ResponseEntity.ok(user);
     }
+    @GetMapping("/users/{username}/layout")
+    public ResponseEntity<?> getUserLayout(@PathVariable String username) {
+        return userRepo.findByUsername(username)
+                .map(user -> ResponseEntity.ok(user.getDashboardLayout() == null ? "[]" : user.getDashboardLayout()))
+                .orElse(ResponseEntity.status(404).body("User not found"));
+    }
+
+    @PostMapping("/users/{username}/layout")
+    public ResponseEntity<?> saveUserLayout(@PathVariable String username, @RequestBody String layoutJson) {
+        return userRepo.findByUsername(username)
+                .map(user -> {
+                    user.setDashboardLayout(layoutJson);
+                    userRepo.save(user);
+                    return ResponseEntity.ok("Layout saved");
+                })
+                .orElse(ResponseEntity.status(404).body("User not found"));
+    }
+
 }
