@@ -108,14 +108,21 @@ public class AuthController {
     }
 
     @PostMapping("/users/{username}/layout")
-    public ResponseEntity<?> saveUserLayout(@PathVariable String username, @RequestBody String layoutJson) {
+    public ResponseEntity<?> saveUserLayout(@PathVariable String username, @RequestBody Object layout) {
         return userRepo.findByUsername(username)
                 .map(user -> {
-                    user.setDashboardLayout(layoutJson);
-                    userRepo.save(user);
-                    return ResponseEntity.ok("Layout saved");
+                    try {
+                        // convert layout object to JSON string correctly
+                        String json = new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(layout);
+                        user.setDashboardLayout(json);
+                        userRepo.save(user);
+                        return ResponseEntity.ok("Layout saved");
+                    } catch (Exception e) {
+                        return ResponseEntity.status(500).body("Failed to save layout");
+                    }
                 })
                 .orElse(ResponseEntity.status(404).body("User not found"));
     }
+
 
 }
