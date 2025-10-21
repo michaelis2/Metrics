@@ -103,19 +103,27 @@ public class AuthController {
         return ResponseEntity.ok(user);
     }
     @GetMapping("/users/{username}/layout")
-    public ResponseEntity<?> getUserLayout(@PathVariable String username) {
+    public ResponseEntity<?> getUserLayout(@PathVariable String username, Principal principal) {
+        // Only allow users to access their own layout
+        if (!principal.getName().equals(username)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can only view your own layout");
+        }
+
         return userRepo.findByUsername(username)
                 .map(user -> ResponseEntity.ok(user.getDashboardLayout() == null ? "[]" : user.getDashboardLayout()))
                 .orElse(ResponseEntity.status(404).body("User not found"));
     }
+
 
     @PostMapping("/users/{username}/layout")
     public ResponseEntity<?> saveUserLayout(@PathVariable String username,
                                             @RequestBody String layoutJson,
                                             Principal principal) {
         if (!principal.getName().equals(username)) {
+            // user is trying to edit someone else's layout
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can only edit your own layout");
         }
+
         return userRepo.findByUsername(username)
                 .map(user -> {
                     user.setDashboardLayout(layoutJson);
@@ -124,5 +132,6 @@ public class AuthController {
                 })
                 .orElse(ResponseEntity.status(404).body("User not found"));
     }
+
 
 }
