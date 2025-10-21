@@ -31,7 +31,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/api/auth/users/*/layout").authenticated()
                         .requestMatchers("/api/auth/users/**").hasRole("ADMIN")
-                        .requestMatchers("/api/metrics/**").authenticated()
+                        .requestMatchers("/api/metrics/**").authenticated()  // <-- no comma here
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
