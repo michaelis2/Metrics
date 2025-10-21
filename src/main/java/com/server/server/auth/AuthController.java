@@ -1,9 +1,11 @@
 package com.server.server.auth;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -108,7 +110,12 @@ public class AuthController {
     }
 
     @PostMapping("/users/{username}/layout")
-    public ResponseEntity<?> saveUserLayout(@PathVariable String username, @RequestBody String layoutJson) {
+    public ResponseEntity<?> saveUserLayout(@PathVariable String username,
+                                            @RequestBody String layoutJson,
+                                            Principal principal) {
+        if (!principal.getName().equals(username)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You can only edit your own layout");
+        }
         return userRepo.findByUsername(username)
                 .map(user -> {
                     user.setDashboardLayout(layoutJson);
