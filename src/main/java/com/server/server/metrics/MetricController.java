@@ -50,6 +50,7 @@ public class MetricController {
         return fetchMetrics("HEARTBEAT", days);
     }
 
+    // ✅ Reusable logic for filtering by days
     private List<SystemMetric> fetchMetrics(String type, Integer days) {
         if (days == null || days <= 0) {
             return repository.getMetricsByType(type);
