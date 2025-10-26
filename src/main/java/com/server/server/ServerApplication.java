@@ -153,35 +153,37 @@ public class ServerApplication implements CommandLineRunner {
         List<Threshold> thresholds = thresholdRepository.findByIpAddressAndMetricType(ip, type.name());
 
         for (Threshold t : thresholds) {
-            if (value > t.getThreshold()) {
-                String message = ip + ": " + type.name() +
-                        " exceeded threshold of " + t.getThreshold() +
-                        "% (value = " + value + "%)";
+            float limit = t.getThreshold();
 
-                Alert alert = new Alert();
-                alert.setIpAddress(ip);
-                alert.setMetricType(type.name());
-                alert.setThresholdValue(t.getThreshold());
-                alert.setActualValue(value);
-                alert.setMessage(message);
-                alert.setTimestamp(now);
-                alert.setActive(true);
+            // Get the most recent alert for this IP + metric
+            Alert latestAlert = alertRepository
+                    .findTopByIpAddressAndMetricTypeOrderByTimestampDesc(ip, type.name());
 
-                alertRepository.save(alert);
-
-            } else {
-                List<Alert> activeAlerts = alertRepository
-                        .findAllByIpAddressAndMetricTypeAndActiveTrue(ip, type.name());
-
-                for (Alert a : activeAlerts) {
-                    a.setActive(false);
-                    a.setActualValue(value);
-                    a.setTimestamp(now);
-                    alertRepository.save(a);
+            // CASE 1: Value above threshold → trigger alert
+            if (value > limit) {
+                if (latestAlert == null || !latestAlert.isActive()) {
+                    String message = ip + ": " + type.name() +
+                            " exceeded threshold of " + limit +
+                            "% (value = " + value + "%)";
+                    Alert alert = new Alert(ip, type.name(), limit, value, message, now);
+                    alert.setActive(true);
+                    alertRepository.save(alert);
+                    System.out.println("⚠️ Created new alert for " + type.name());
+                }
+            }
+            // CASE 2: Value below or equal → deactivate active alert
+            else {
+                if (latestAlert != null && latestAlert.isActive()) {
+                    latestAlert.setActive(false);
+                    latestAlert.setActualValue(value);
+                    latestAlert.setMessage(type.name() + " back to normal (" + value + "% ≤ " + limit + "%)");
+                    latestAlert.setTimestamp(now);
+                    alertRepository.save(latestAlert);
+                    System.out.println("✅ Deactivated alert for " + type.name());
                 }
             }
         }
-    }// In ServerApplication.java
+    }
 
 
 }

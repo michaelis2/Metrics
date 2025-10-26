@@ -11,5 +11,8 @@ public interface AlertRepository extends JpaRepository<Alert, Long> {
     public List<Alert> findAllByIpAddressAndMetricTypeAndActiveTrue(String var1, String var2);
 
     public List<Alert> findAllByOrderByTimestampDesc();
+
+    Alert findTopByIpAddressAndMetricTypeOrderByTimestampDesc(String ipAddress, String metricType);
+
 }
 
