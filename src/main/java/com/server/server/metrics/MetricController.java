@@ -1,5 +1,6 @@
 package com.server.server.metrics;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -47,5 +48,13 @@ public class MetricController {
     public List<SystemMetric> getHeartbeatMetrics() {
         return this.repository.getMetricsByType("HEARTBEAT");
     }
+    private List<SystemMetric> fetchMetrics(String type, Integer days) {
+        if (days == null || days <= 0) {
+            return repository.getMetricsByType(type);
+        }
+        LocalDateTime fromTime = LocalDateTime.now().minusDays(days);
+        return repository.getMetricsByTypeAndAfterTimestamp(type, fromTime);
+    }
+
 }
 
