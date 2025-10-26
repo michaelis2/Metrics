@@ -51,10 +51,16 @@ public class MetricController {
     }
 
     private List<SystemMetric> fetchMetrics(String type, Integer days) {
+        LocalDateTime fromTime;
+
         if (days == null || days <= 0) {
-            return repository.getMetricsByType(type);
+            // Today
+            fromTime = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        } else {
+            fromTime = LocalDateTime.now().minusDays(days);
         }
-        LocalDateTime fromTime = LocalDateTime.now().minusDays(days);
+
         return repository.getMetricsByTypeAndAfterTimestamp(type, fromTime);
     }
+
 }

@@ -14,7 +14,8 @@ public interface SystemMetricRepository extends JpaRepository<SystemMetric, Long
     @Query(value="SELECT * FROM SYSTEM_METRICS ORDER BY TIMESTAMP", nativeQuery=true)
     public List<SystemMetric> getAllMetrics();
 
-    @Query(value = "SELECT * FROM SYSTEM_METRICS WHERE TYPE = :type AND TIMESTAMP >= :timestamp ORDER BY TIMESTAMP", nativeQuery = true)
+
+    @Query("SELECT m FROM SystemMetric m WHERE m.type = :type AND m.timestamp >= :timestamp ORDER BY m.timestamp")
     List<SystemMetric> getMetricsByTypeAndAfterTimestamp(
             @Param("type") String type,
             @Param("timestamp") LocalDateTime timestamp
