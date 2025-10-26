@@ -165,5 +165,27 @@ class ServerApplicationTests {
         verify(metricRepository, never()).save(any());
     }
 
+    @Test
+    void testCheckThreshold_BelowThresholdDeactivatesAlerts() throws Exception {
+        Threshold threshold = new Threshold();
+        threshold.setThreshold(70f);
+
+        Alert existingAlert = new Alert();
+        existingAlert.setActive(true);
+
+        when(thresholdRepository.findByIpAddressAndMetricType("127.0.0.1", "CPU"))
+                .thenReturn(List.of(threshold));
+        when(alertRepository.findAllByIpAddressAndMetricTypeAndActiveTrue("127.0.0.1", "CPU"))
+                .thenReturn(List.of(existingAlert));
+
+        var method = ServerApplication.class.getDeclaredMethod(
+                "checkThreshold", String.class, MetricType.class, float.class, LocalDateTime.class);
+        method.setAccessible(true);
+
+        method.invoke(serverApp, "127.0.0.1", MetricType.CPU, 50f, LocalDateTime.now());
+
+        verify(alertRepository, times(1)).save(existingAlert);
+        assertFalse(existingAlert.isActive());
+    }
 
 }
