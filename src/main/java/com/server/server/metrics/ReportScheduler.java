@@ -1,18 +1,15 @@
 package com.server.server.metrics;
 
 import jakarta.mail.MessagingException;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import jakarta.mail.internet.MimeMessage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -26,59 +23,73 @@ public class ReportScheduler {
 
     private static final String RECIPIENT = "amanda.irawan@gmail.com";
 
-
-    @Scheduled(cron = "0 */30 * * * *") // every 30 minutes
+    // 🕒 Every 30 minutes
+    @Scheduled(cron = "0 */10 * * * *") // every 10 minutes
     public void generateAndSendReport() {
         try {
-            byte[] excelData = createExcelReport();
-            sendEmailWithAttachment(excelData);
+            String htmlReport = createHtmlReport();
+            sendEmailWithReport(htmlReport);
             System.out.println("✅ Sent 7-day system report to " + RECIPIENT);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private byte[] createExcelReport() throws IOException {
+    /**
+     * Creates a 7-day HTML report for all metric types.
+     */
+    private String createHtmlReport() {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        StringBuilder html = new StringBuilder();
 
-        XSSFWorkbook workbook = new XSSFWorkbook();
+        html.append("<html><body>");
+        html.append("<h2>System Metrics Report (Last 7 Days)</h2>");
+        html.append("<p>Generated: ")
+                .append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .append("</p>");
 
         for (MetricType type : MetricType.values()) {
             List<SystemMetric> metrics = metricRepository.findByTypeAndTimestampAfter(type, sevenDaysAgo);
 
-            Sheet sheet = workbook.createSheet(type.name());
-            Row header = sheet.createRow(0);
-            header.createCell(0).setCellValue("Timestamp");
-            header.createCell(1).setCellValue("Client IP");
-            header.createCell(2).setCellValue("Value");
+            if (metrics.isEmpty()) continue;
 
-            int rowNum = 1;
+            html.append("<h3>").append(type.name()).append("</h3>");
+            html.append("<table border='1' cellspacing='0' cellpadding='5' style='border-collapse:collapse;'>");
+            html.append("<tr>")
+                    .append("<th>Client IP</th>")
+                    .append("<th>Type</th>")
+                    .append("<th>Value</th>")
+                    .append("<th>Timestamp</th>")
+                    .append("</tr>");
+
             for (SystemMetric metric : metrics) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(metric.getTimestamp().toString());
-                row.createCell(1).setCellValue(metric.getClientIp());
-                row.createCell(2).setCellValue(metric.getValue());
+                html.append("<tr>")
+                        .append("<td>").append(metric.getClientIp()).append("</td>")
+                        .append("<td>").append(metric.getType()).append("</td>")
+                        .append("<td>").append(metric.getValue()).append("</td>")
+                        .append("<td>").append(metric.getTimestamp().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))).append("</td>")
+                        .append("</tr>");
             }
 
-            for (int i = 0; i < 3; i++) sheet.autoSizeColumn(i);
+            html.append("</table><br>");
         }
 
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        workbook.write(outputStream);
-        workbook.close();
+        html.append("<p>— Monitoring System</p>");
+        html.append("</body></html>");
 
-        return outputStream.toByteArray();
+        return html.toString();
     }
 
-    private void sendEmailWithAttachment(byte[] excelData) throws MessagingException {
+    /**
+     * Sends the report as an HTML email.
+     */
+    private void sendEmailWithReport(String htmlReport) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
         helper.setTo(RECIPIENT);
         helper.setSubject("System Metrics Report - Last 7 Days");
-        helper.setText("Hello,\n\nAttached is the latest 7-day system metrics report.\n\nBest regards,\nMonitoring System");
-        helper.addAttachment("SystemMetrics_Report_7days.xlsx",
-                new org.springframework.core.io.ByteArrayResource(excelData));
+        helper.setText(htmlReport, true); // true = HTML format
 
         mailSender.send(message);
     }
