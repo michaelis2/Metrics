@@ -12,6 +12,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -21,7 +23,9 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+
 @SpringBootApplication
+@EnableScheduling
 public class ServerApplication implements CommandLineRunner {
 
     private static final int BUFFER_SIZE = 1024;

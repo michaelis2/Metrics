@@ -21,4 +21,7 @@ public interface SystemMetricRepository extends JpaRepository<SystemMetric, Long
             @Param("timestamp") LocalDateTime timestamp
     );
 
+
+    List<SystemMetric> findByTypeAndTimestampAfter(MetricType type, LocalDateTime timestamp);
+
 }
