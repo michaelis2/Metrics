@@ -23,7 +23,7 @@ public class ReportScheduler {
 
     private static final String RECIPIENT = "amanda.irawan@gmail.com";
 
-    // 🕒 Every 30 minutes
+
     @Scheduled(cron = "0 */10 * * * *") // every 10 minutes
     public void generateAndSendReport() {
         try {
@@ -35,9 +35,6 @@ public class ReportScheduler {
         }
     }
 
-    /**
-     * Creates a 7-day HTML report for all metric types.
-     */
     private String createHtmlReport() {
         LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
         StringBuilder html = new StringBuilder();
@@ -80,16 +77,14 @@ public class ReportScheduler {
         return html.toString();
     }
 
-    /**
-     * Sends the report as an HTML email.
-     */
+
     private void sendEmailWithReport(String htmlReport) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
         helper.setTo(RECIPIENT);
         helper.setSubject("System Metrics Report - Last 7 Days");
-        helper.setText(htmlReport, true); // true = HTML format
+        helper.setText(htmlReport, true);
 
         mailSender.send(message);
     }

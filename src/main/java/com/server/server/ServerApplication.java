@@ -13,7 +13,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -30,10 +29,11 @@ public class ServerApplication implements CommandLineRunner {
 
     private static final int BUFFER_SIZE = 1024;
     static final byte SERVER_VERSION = 1;
-
     private final SystemMetricRepository metricRepository;
     private final ThresholdRepository thresholdRepository;
     private final AlertRepository alertRepository;
+
+
     @Autowired
     private Environment environment;
     @Autowired
@@ -74,10 +74,9 @@ public class ServerApplication implements CommandLineRunner {
             while (true) {
                 socket.receive(packet);
 
-                // Print sender info
                 System.out.println("Received packet from " + packet.getAddress() + ":" + packet.getPort());
 
-                // Print raw bytes
+
                 byte[] data = packet.getData();
                 int length = packet.getLength();
                 System.out.print("Raw bytes: ");
@@ -86,7 +85,7 @@ public class ServerApplication implements CommandLineRunner {
                 }
                 System.out.println();
 
-                // Optional: print as string (if UTF-8 text)
+
                 String text = new String(data, 0, length);
                 System.out.println("As string: " + text);
 
@@ -185,7 +184,7 @@ public class ServerApplication implements CommandLineRunner {
                 }
             }
         }
-    }// In ServerApplication.java
+    }
 
 
 }
