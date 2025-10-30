@@ -1,0 +1,91 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #FFEFF9, #FFDFF3);
+  font-family: "Poppins", sans-serif;
+}
+
+
+.login-card {
+  background-color: #fff;
+  padding: 2rem 3rem;
+  border-radius: 1rem;
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  text-align: center;
+}
+
+
+.login-card h2 {
+  margin-bottom: 1.8rem;
+  color: #333;
+  font-weight: 600;
+}
+
+
+.input-container {
+  background: linear-gradient(145deg, #ffffff, #f9e7f3);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.8),
+              0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+
+.form-group {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #444;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.form-group input {
+  width: 90%;
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #ff8ccf;
+  box-shadow: 0 0 6px rgba(255, 120, 190, 0.3);
+}
+
+
+.login-btn {
+  width: 100%;
+  background-color: #ff7ac6;
+  color: white;
+  border: none;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.login-btn:hover {
+  background-color: #f05aa6;
+  transform: scale(1.02);
+}
+
+
+.error-message {
+  color: #ff3b3b;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}

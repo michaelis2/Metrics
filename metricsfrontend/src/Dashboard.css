@@ -1,0 +1,93 @@
+.dashboard-container {
+  padding: 20px;
+  text-align: center;
+  background: linear-gradient(135deg, #fef6ff, #f8f9fa);
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+  transition: background 0.4s ease-in-out;
+}
+
+h2 {
+  color: #333;
+  margin-bottom: 25px;
+  font-weight: 600;
+}
+
+.charts-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 25px;
+  transition: all 0.3s ease;
+}
+
+.chart-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 430px;
+  transition: 
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    background 0.3s ease;
+  cursor: grab;
+}
+
+.chart-card:active {
+  cursor: grabbing;
+}
+
+.chart-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.chart-card h3 {
+  color: #444;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.error-message {
+  color: #ff3b3b;
+  font-size: 1rem;
+  background-color: #ffe5e5;
+  padding: 12px 18px;
+  border-radius: 8px;
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+
+.react-grid-item {
+  transition: all 0.25s ease-in-out !important;
+  border-radius: 16px;
+}
+
+.react-grid-item.react-grid-placeholder {
+  background: rgba(255, 182, 222, 0.25);
+  border: 2px dashed #ff8ad4;
+  border-radius: 16px;
+  transition: all 0.2s ease;
+}
+
+
+.react-resizable-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  bottom: 6px;
+  right: 6px;
+  background: #ff7ac6;
+  border-radius: 3px;
+  cursor: se-resize;
+  opacity: 0.8;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.react-resizable-handle:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}

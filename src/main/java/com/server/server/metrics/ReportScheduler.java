@@ -29,7 +29,7 @@ public class ReportScheduler {
         try {
             String htmlReport = createHtmlReport();
             sendEmailWithReport(htmlReport);
-            System.out.println("✅ Sent 7-day system report to " + RECIPIENT);
+            System.out.println("Sent 7-day system report to " + RECIPIENT);
         } catch (Exception e) {
             e.printStackTrace();
         }
