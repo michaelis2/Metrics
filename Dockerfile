@@ -10,7 +10,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # -------- Stage 2: Runtime --------
-FROM openjdk:23
+FROM openjdk:23-slim
 WORKDIR /app
 
 # Copy the built JAR from the builder stage
