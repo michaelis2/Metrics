@@ -10,7 +10,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # -------- Stage 2: Runtime --------
-FROM openjdk:23-slim
+FROM eclipse-temurin:23-jre-jammy
 WORKDIR /app
 
 # Copy the built JAR from the builder stage
